@@ -32,41 +32,28 @@ import org.mapstruct.Mapper;
 /**
  * @author orange add
  */
-@SupportedAnnotationTypes("pers.orange.To")
-@SupportedSourceVersion( SourceVersion.RELEASE_11 )
+@SupportedAnnotationTypes("pers.orange.To") // 对被@To注解的类进行扫描
+@SupportedSourceVersion( SourceVersion.RELEASE_11 ) // 支持的JDK版本
+// 继承AbstractProcessor类,实现process方法
 public class MappingProcessor extends AbstractProcessor {
-
-    public static final String COMMON_MAPPER_CLASS_NAME = "pers.orange.CommonMapper";
-
-    private Messager messager;
-
-    private Types typeUtils;
-
-    private Elements elementUtils;
-
-    private Filer filer;
-
-    private TypeMirror commonMapperType;
+    private Messager messager; // 编译输出日志
+    private Filer filer; // 文件输出
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init( processingEnv );
         this.messager = processingEnv.getMessager();
-        this.typeUtils = processingEnv.getTypeUtils();
-        this.elementUtils = processingEnv.getElementUtils();
-        this.commonMapperType = elementUtils.getTypeElement( COMMON_MAPPER_CLASS_NAME ).asType();
         this.filer = processingEnv.getFiler();
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        messager.printMessage( Diagnostic.Kind.NOTE,"***MapStruct-add start***" );
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith( To.class );
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith( To.class ); // 获得被@To注解修饰的元素集合
         for ( Element element : elements ) {
             messager.printMessage( Diagnostic.Kind.NOTE, element.getSimpleName().toString());
             To annotation = element.getAnnotation( To.class );
-            TypeMirror sourceTypeMirror = element.asType();
-            TypeMirror targetTypeMirror = getTargetTypeMirror( annotation );
+            TypeMirror sourceTypeMirror = element.asType(); // 获得源对象类型
+            TypeMirror targetTypeMirror = getTargetTypeMirror( annotation ); // 获得目标对象类型
             createMapperFile( sourceTypeMirror, targetTypeMirror );
         }
         return false;
@@ -88,6 +75,7 @@ public class MappingProcessor extends AbstractProcessor {
         String targetName = getSimpleName(targetTypeMirror );
         String mapperFileName = sourceName+"To"+targetName+"Mapper";
         String packageName = getPackageName( sourceTypeMirror );
+        // 使用JavaPoet框架,简化Java文件的生成,也可以直接使用字符串拼接来实现
         TypeSpec typeSpec = TypeSpec.interfaceBuilder( mapperFileName )
             .addModifiers( Modifier.PUBLIC )
             .addAnnotation( Mapper.class )
