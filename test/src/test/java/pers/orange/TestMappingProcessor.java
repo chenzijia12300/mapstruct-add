@@ -1,5 +1,6 @@
 package pers.orange;
 
+import static org.junit.Assert.*;
 import org.junit.Test;
 import pers.orange.BeanUtils;
 
@@ -10,15 +11,24 @@ import pers.orange.BeanUtils;
 public class TestMappingProcessor {
 
     @Test
-    public void test01(){
+    public void testCreate(){
         Source source = new Source();
         source.setId( 1 );
         source.setName( "source" );
         Target target = new Target();
         BeanUtils.copyProperties( source, target );
-        System.out.println(target);
-        Target target1 = BeanUtils.copProperties( source, Target.class );
-        System.out.println(target1);
+        assertEquals( source.getId(), target.getId() );
+        assertEquals( source.getName(), target.getName() );
+    }
+
+    @Test
+    public void testUpdate(){
+        Source source = new Source();
+        source.setId( 1 );
+        source.setName( "source" );
+        Target target = BeanUtils.copProperties( source, Target.class );
+        assertEquals( source.getId(), target.getId() );
+        assertEquals( source.getName(), target.getName() );
     }
 
     @Test
