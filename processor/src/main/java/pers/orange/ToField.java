@@ -9,8 +9,9 @@ import java.lang.annotation.Target;
  * @author orange add
  */
 @Retention( RetentionPolicy.SOURCE )
-@Target( ElementType.TYPE )
-public @interface To {
+@Target( ElementType.FIELD )
+public @interface ToField {
 
-    Class target();
+    String target();
+
 }
